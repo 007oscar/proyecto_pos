@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Navbar, NavDropdown, Nav, Col, Form, Modal, Container, Button} from 'react-bootstrap'
+import { Navbar, NavDropdown, Nav, Table, Col, Image, Row, Form, Modal, Container, Button} from 'react-bootstrap'
+
 
 function MydModalWithGrid({show, onHide}) {
   return (
@@ -12,10 +13,7 @@ function MydModalWithGrid({show, onHide}) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-
-
        <Container>
-          
         <Form>
           <Form.Group controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
@@ -24,7 +22,6 @@ function MydModalWithGrid({show, onHide}) {
               We'll never share your email with anyone else.
             </Form.Text>
           </Form.Group>
-
           <Form.Group controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control type="password" placeholder="Password" />
@@ -44,6 +41,104 @@ function MydModalWithGrid({show, onHide}) {
       </Modal.Footer>
     </Modal>
   );
+}
+
+function Display(){
+  return(
+    <>
+       
+        <Container fluid={true}>
+          <Row>
+            <Col sm={3}>
+              <Ticket />
+            </Col>
+            <Col sm={9}>
+              <Articles />
+            </Col>
+          </Row>
+        </Container>
+    </>
+  )
+}
+
+function Articles(){
+  return (
+    <Container>
+      <Row>
+        <Col xs={6} md={3}>
+          <Image src="img/1.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/2.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/3.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/4.jpg" thumbnail />
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={6} md={3}>
+          <Image src="img/5.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/6.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/8.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/9.jpg" thumbnail />
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={6} md={3}>
+          <Image src="img/10.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/11.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/12.jpg" thumbnail />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src="img/13.jpg" thumbnail />
+        </Col>
+      </Row>
+    </Container>
+
+    )
+}
+function Ticket(){
+  
+  const items = [...Array(20)].map((val, i) => (<tr> <td>${i}</td> <td>Chicharrones</td>    <td>1</td>     <td>$50.00</td> <td>$50.00</td> </tr>))
+
+  
+  return(
+  
+    <>
+      <Container style={{'max-height': 'calc(100vh - 210px)', 'overflow-y': 'auto'}}>
+        <Table striped bordered hover size="sm"  >
+          <thead fixed>
+            <tr>
+              <th>#</th>
+              <th>Articulo</th>
+              <th>Cantidad</th>
+              <th>P. U.</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              items.map((item, i)=>(item))
+
+            }
+          </tbody>
+        </Table>
+        </Container>
+  </>
+  )
 }
 
 function NavBar(props) {
@@ -73,7 +168,7 @@ function App() {
   return (
       <>
         <NavBar setModalShow={setModalShow} />
-        hola mundo
+        <Display />
         <MydModalWithGrid show={modalShow} onHide={() => setModalShow(false)} />
       </>
       );
