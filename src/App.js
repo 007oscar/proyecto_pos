@@ -9,6 +9,23 @@ import { Navbar, NavDropdown, Nav, Table, Col, Image, Row,
 function MydModalWithGrid({show, onHide, datos}) {  
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+
+  // const [validated, setValidated] = useState(false);
+
+  const handleSubmit = event => {
+    const form = event.currentTarget;
+    // if (form.checkValidity() === false) {
+    //   event.preventDefault();
+    //   event.stopPropagation();
+    // }
+    event.preventDefault();
+    event.stopPropagation();
+    datos(email, pass)
+   // setValidated(true);
+    // TODO revisar la validacion para que señale en el formulario antes de enviar
+    // //onClick={()=>datos(email, pass) }  <--- va el boton submit ...... pequeño cambio
+  };
+
   return (
     <Modal show={show} onHide={onHide} aria-labelledby="contained-modal-title-vcenter">
       <Modal.Header closeButton>
@@ -18,7 +35,7 @@ function MydModalWithGrid({show, onHide, datos}) {
       </Modal.Header>
       <Modal.Body>
        <Container>
-        <Form>
+        <Form onSubmit={handleSubmit} >
           <Form.Group controlId="formEmail">
             <Form.Label>Email</Form.Label>
             <Form.Control type="email" placeholder="Enter email" value={email} onChange={ e => setEmail(e.target.value)} />
@@ -33,7 +50,7 @@ function MydModalWithGrid({show, onHide, datos}) {
           <Form.Group controlId="formRecordar">
             <Form.Check type="checkbox" label="Recordar" />
           </Form.Group>
-          <Button variant="primary" onClick={(e)=>{e.preventDefault(); datos(email, pass)} } >
+          <Button variant="primary" type="submit"  >  
             Submit
           </Button>
         </Form>
@@ -194,24 +211,21 @@ function Ticket(){
   )
 }
 
-function MyVerticallyCenteredModal(props) {
+function ModalDialog(props) {
+  console.log(props)
   return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
+    <Modal  show={props.show} onHide={()=>props.status('cancelar')} >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Logout
-        </Modal.Title>
+        <Modal.Title>PoS Devf</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
-        <h4>Esta seguro que desea desconectarse?</h4>
+        <p>¿Seguro que desea cerrar sesión?.</p>
       </Modal.Body>
+
       <Modal.Footer>
-        <Button onClick={props.onHide}>Desconectarse</Button>
+        <Button variant="secondary" onClick={()=> props.status('cancelar')}>Cancelar</Button>
+        <Button variant="primary" onClick={()=>props.status('salir')} >Desconectarse</Button>
       </Modal.Footer>
     </Modal>
   );
@@ -226,7 +240,7 @@ function NavBar(props) {
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav className="ml-auto">
-        { props.login ? <Nav.Link href="" onClick={() => props.setModalShow('logout')} >Logout</Nav.Link>:
+        { props.login ? <Nav.Link href=""  onClick={() => props.setModalShow('logout')}>Logout</Nav.Link>:
         <Nav.Link href="" onClick={() => props.setModalShow('login')} >Login</Nav.Link>}
         
         <NavDropdown title="Configuración" id="basic-nav-dropdown">
@@ -311,7 +325,6 @@ function App() {
     },    
   ]
    
-
   function handleLogin(email, pass){
     if(email === 'oscaralberto@gmail.com' && pass === '123456'){
       setIsloggedin(true)
@@ -326,17 +339,32 @@ function App() {
     if (isLoggout) setIsloggedin(false)
   }
   function showModal(modal){
+    console.log('is logout ',modal)
     modal === 'login' ? setModalShow(true) : setModalShowLoggout(true)
   }
+
+  function statusLogout(status){
+    console.log('status log out ',status)
+    if(status === 'cancelar'){
+      setModalShowLoggout(false)
+    }else{
+      setModalShowLoggout(false); setIsloggedin(false)}
+    }
+    console.log('modal ', modalShowLoggout)
+    
   return (
       <>
+          
           <NavBar setModalShow={showModal} login={isLoggedin} status={status} />
           <MydModalWithGrid show={modalShow} datos={handleLogin} onHide={() => setModalShow(false)} />
-          <MyVerticallyCenteredModal
+          
+          {/* <MyVerticallyCenteredModal
           show={modalShowLoggout}
           onHide={() => {setModalShowLoggout(false); setIsloggedin(false)} }
-        />
+        /> */}
           { isLoggedin ? <Display /> : <Image src="img/p1.png" className="rounded mx-auto d-block" />}
+
+          <ModalDialog  show={modalShowLoggout} status={statusLogout}  onHide={() => setModalShowLoggout(false)} />
 
           {/* { isLoggedin && <Display />} */}
 
