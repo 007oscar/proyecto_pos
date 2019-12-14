@@ -6,6 +6,67 @@ import { Navbar, NavDropdown, Nav, Table, Col, Image, Row,
         InputGroup, FormControl, Form, Modal, Container, Button} from 'react-bootstrap'
 
 
+function MyModalPay(props) {  
+  const [recibido, setRecibido] = useState('')
+  const [change, setChange] = useState('')
+
+  let total = new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(props.total)
+  let cambio = ''
+  let dineroRecibido = 0
+  function calcularCambio(seRecibe){
+    console.log(seRecibe)
+    console.log(props.total - Number(seRecibe))
+    console.log('cambio', cambio)
+    dineroRecibido = props.total - Number(seRecibe)
+
+    setRecibido(seRecibe)
+    cambio = new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(props.total - Number(seRecibe))
+    setChange(cambio)
+  }
+  return (
+    <Modal show={props.show} onHide={() => props.handleclose()}>
+        <Modal.Header closeButton>
+          <Modal.Title>Caja Devf</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <div>
+            <InputGroup size="lg" style={{ marginBottom:6}}>
+              <InputGroup.Prepend>
+                <InputGroup.Text id="inputGroup-sizing-lg">Total</InputGroup.Text>
+              </InputGroup.Prepend>
+              <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" 
+              className="text-info font-weight-bold text-right" onChange={()=>''} value={total }
+              />
+            </InputGroup>
+            <InputGroup size="lg" style={{ marginBottom:6}}>
+              <InputGroup.Prepend>
+                <InputGroup.Text id="inputGroup-sizing-lg">Recibido</InputGroup.Text>
+              </InputGroup.Prepend>
+              <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" 
+              className="text-warn font-weight-bold text-right" onChange={(e)=> calcularCambio(e.target.value) } value={recibido}
+              />
+            </InputGroup>
+            <InputGroup size="lg">
+              <InputGroup.Prepend>
+                <InputGroup.Text id="inputGroup-sizing-lg">Cambio</InputGroup.Text>
+              </InputGroup.Prepend>
+              <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" 
+              className="text-danger font-weight-bold text-right" onChange={()=>''} value={ change } />
+            </InputGroup>
+          </div>  
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={ () => props.handleclose() }>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={ () =>props.cobrar(props.total - dineroRecibido ) }>
+            Cobrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+  );
+}
+
 function MydModalWithGrid({show, onHide, datos}) {  
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
@@ -63,129 +124,254 @@ function MydModalWithGrid({show, onHide, datos}) {
   );
 }
 
-function Pay(){
+function Pay(props){
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  // function cobrar(dinero){
+  //   if(dinero <= 0){
+
+  //   }
+  // }
+
   return (
     <div>
-      <Button variant="primary" size="lg" block style={{ marginTop: 50 }}>
+      <Button variant="primary" size="lg" block style={{ marginTop: 50 }} onClick={handleShow}  >
         Cobrar
       </Button>
- 
+      <MyModalPay show={show} handleclose= { ()=> setShow(false) } total={props.total} estadoTicket={props.estatoTicket} />
     </div>
   )
 }
 
-function Total(){
+function Total(props){
 
+  let total = new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(props.total)
+  let iva = new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(props.total * 0.16)
+  let subtotal = new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(props.total - (props.total * 0.16))
   return(
     <div>
       <InputGroup size="lg" style={{ marginBottom:6}}>
         <InputGroup.Prepend>
           <InputGroup.Text id="inputGroup-sizing-lg">Sub-Total</InputGroup.Text>
         </InputGroup.Prepend>
-        <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" />
+        <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" 
+        className="text-info font-weight-bold text-right" onChange={()=>''} value={subtotal }
+        />
       </InputGroup>
       <InputGroup size="lg" style={{ marginBottom:6}}>
         <InputGroup.Prepend>
           <InputGroup.Text id="inputGroup-sizing-lg">IVA</InputGroup.Text>
         </InputGroup.Prepend>
-        <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" />
+        <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" 
+        className="text-warn font-weight-bold text-right" onChange={()=>''} value={iva }
+        />
       </InputGroup>
       <InputGroup size="lg">
         <InputGroup.Prepend>
           <InputGroup.Text id="inputGroup-sizing-lg">Total</InputGroup.Text>
         </InputGroup.Prepend>
-        <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" />
+        <FormControl aria-label="Large" aria-describedby="inputGroup-sizing-sm" 
+        className="text-danger font-weight-bold text-right" onChange={()=>''} value={total } />
       </InputGroup>
     </div>
   )
 }
 
-function Display(){
+function Display(props){
+
+  const [food, setFood] = useState([])
+  const [modalShow, setModalShow] = useState({ modal:false, comida:null });
+
+  function handleSetFood(foodChoiced){
+    setFood( (prev) =>(
+      [...prev, foodChoiced]
+    ))
+    console.log('foot ---',food)
+    console.log('escogio  ',foodChoiced)
+  }
+
+  function handleTicket(index){
+    //desplegar aviso: desea borrar x comida?
+    console.log('handle ticket 1')
+    if(!modalShow.modal){
+      setModalShow({modal:true, comida:food[index]})
+    }else{
+      
+    }
+  }
+
+  function borrar(index){
+    console.log('borrar rrrrrrr', index)
+      //let nuevoTicket = food
+      for(let i= 0; i<food.length; i++){
+        if(index !== food[i].id){
+          food.pop(food[i])
+          break
+        }
+      }
+      setFood(food)
+      setModalShow({...modalShow, modal:false})
+  }
+  
+  function close(){
+    setModalShow({...modalShow, modal:false})
+  }
+
+  let total = 0
+  for(let i= 0; i<food.length; i++) {
+    total += food[i].costo
+  }
+
+  function estadoTicket(dinero){
+
+  }
   return(
     <>
         <Container fluid={true} >
           <Row>
             <Col sm={4}>
-              <Ticket />
+              <Ticket handleTicket={handleTicket} borrar={borrar} food={food}/>
             </Col>
             <Col sm={8}>
-              <Articles />
+              <Articles setfood = {handleSetFood} />
             </Col>
           </Row>
           <Row>
           <Col sm={4}>
-              <Total />
+              <Total total = {total}  />
             </Col>
             <Col sm={8}>
-              <Pay />
+              <Pay total={total} estadoTicket ={estadoTicket} />
             </Col>
           </Row>
         </Container>
+        <ModalDialogFood  show={modalShow.modal} 
+        comida={modalShow.comida === null? '':modalShow.comida}  
+        onHide={() => setModalShow({...modalShow, modal:false})} 
+        borrar = {borrar}
+        close = {close}
+        />
     </>
   )
 }
 
-function Articles(){
+function Articles(props){
+  const menu = [
+    {
+      id: 0,
+      platillo: "HAMBURGUESA",
+      costo: 70,
+      imagen: 'img/1.jpg'
+    },
+    {
+      id: 1,
+      platillo: "SOPA DE VERDURAS",
+      costo: 65,
+      imagen: 'img/2.jpg'
+    },
+    {
+      id: 2,
+      platillo: "CARNE ASADA",
+      costo: 80,
+      imagen: 'img/3.jpg'
+    },
+    {
+      id: 3,
+      platillo: "BISTEK CON VERDURAS",
+      costo: 85,
+      imagen: 'img/4.jpg'
+    },
+    {
+      id: 4,
+      platillo: "ENSALADA ALL INCLUSIVE",
+      costo: 210,
+      imagen: 'img/5.jpg'
+    },
+    {
+      id: 5,
+      platillo: "POLLUELO ALL INCLUSIVE",
+      costo: 220,
+      imagen: 'img/6.jpg'
+    },
+    {
+      id: 6,
+      platillo: "ENCHILADAS",
+      costo: 65,
+      imagen: 'img/8.jpg'
+    },
+    {
+      id: 7,
+      platillo: "BISTEZOTE",
+      costo: 90,
+      imagen: 'img/9.jpg'
+    },
+    {
+      id: 8,
+      platillo: "MEXCOLANZA",
+      costo: 95,
+      imagen: 'img/10.jpg'
+    },
+    {
+      id: 9,
+      platillo: "WORM-BURGUER",
+      costo: 100,
+      imagen: 'img/11.jpg'
+    },
+    {
+      id: 10,
+      platillo: "SOPA DE CAMARON",
+      costo: 120,
+      imagen: 'img/12.jpg'
+    },
+    {
+      id: 11,
+      platillo: "CAMARONIZA",
+      costo: 80,
+      imagen: 'img/13.jpg'
+    },    
+  ]
+  let listaMenu = []
+  for(let i = 0;i <menu.length ;i+=4){
+    listaMenu.push(
+      <Row key={i}>
+        <Col xs={6} md={3}>
+          <Image src={menu[i].imagen} thumbnail onClick={()=>props.setfood(menu[i])} />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src={menu[i+1].imagen} thumbnail onClick={()=>props.setfood(menu[i+1])} />
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src={menu[i+2].imagen} thumbnail onClick={()=>props.setfood(menu[i+2])}/>
+        </Col>
+        <Col xs={6} md={3}>
+          <Image src={menu[i+3].imagen} thumbnail onClick={()=>props.setfood(menu[i+3])}/>
+        </Col>
+      </Row>
+    )
+  }
+  console.log('menu', listaMenu)
   return (
     <Container>
-      <Row>
-        <Col xs={6} md={3}>
-          <Image src="img/1.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/2.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/3.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/4.jpg" thumbnail />
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={6} md={3}>
-          <Image src="img/5.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/6.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/8.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/9.jpg" thumbnail />
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={6} md={3}>
-          <Image src="img/10.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/11.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/12.jpg" thumbnail />
-        </Col>
-        <Col xs={6} md={3}>
-          <Image src="img/13.jpg" thumbnail />
-        </Col>
-      </Row>
+      {listaMenu}
     </Container>
 
     )
 }
-function Ticket(){
+function Ticket(props){
   
-  const items = [...Array(15)].map((val, i) => (
-  <tr key={i}> 
-    <td>${i}</td> 
-    <td>Chicharrones</td>    
+  const items = [...props.food].map((val, i) => (
+  <tr key={i} onClick={() => props.handleTicket(i) }> 
+    <td>{i + 1}</td> 
+    <td>{val.platillo}</td>
     <td>1</td>     
-    <td>$50.00</td> 
-    <td>$50.00</td> 
+    <td>{ new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(val.costo)}</td> 
+    <td>{ new Intl.NumberFormat("mx-ES", {style: "currency", currency: "MXN"}).format(val.costo)}</td> 
   </tr>))
 
-  
+  console.log('props food ',props.food)
   return(
   
     <>
@@ -202,7 +388,7 @@ function Ticket(){
           </thead>
           <tbody>
             {
-              items.map((item, i)=>(item))
+             items.map((item, i)=>(item))
             }
           </tbody>
         </Table>
@@ -231,9 +417,27 @@ function ModalDialog(props) {
   );
 }
 
+function ModalDialogFood(props) {
+  console.log('modal comidita',props)
+  return (
+    <Modal  show={props.show} onHide={props.onHide} >
+      <Modal.Header closeButton>
+        <Modal.Title>PoS Devf</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <p>¿Seguro que desea eliminar la comida <strong>{props.comida.platillo}</strong> ?.</p>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={()=> props.close() }>Cancelar</Button>
+        <Button variant="primary" onClick={()=> props.borrar(props.comida.id) } >Eliminar</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
 
 function NavBar(props) {
- 
   return (
     <Navbar bg="light" expand="lg">
     <Navbar.Brand href="#home"><strong>PoS</strong></Navbar.Brand>
@@ -259,71 +463,7 @@ function NavBar(props) {
 function App() {
   const [modalShow, setModalShow] = useState(false);
   const [modalShowLoggout, setModalShowLoggout] = useState(false);
-  const [compras, setCompras] = useState([])
   const [isLoggedin, setIsloggedin] = useState(false)
-  
-  const menu = [
-    {
-      id: 0,
-      platillo: "HAMBURGUESA",
-      costo: 70,
-    },
-    {
-      id: 1,
-      platillo: "SOPA DE VERDURAS",
-      costo: 65,
-    },
-    {
-      id: 2,
-      platillo: "CARNE ASADA",
-      costo: 80,
-    },
-    {
-      id: 3,
-      platillo: "BISTEK CON VERDURAS",
-      costo: 85,
-    },
-    {
-      id: 4,
-      platillo: "ENSALADA ALL INCLUSIVE",
-      costo: 210,
-    },
-    {
-      id: 5,
-      platillo: "POLLUELO ALL INCLUSIVE",
-      costo: 220,
-    },
-    {
-      id: 6,
-      platillo: "ENCHILADAS",
-      costo: 65,
-    },
-    {
-      id: 7,
-      platillo: "BISTEZOTE",
-      costo: 90,
-    },
-    {
-      id: 8,
-      platillo: "MEXCOLANZA",
-      costo: 95,
-    },
-    {
-      id: 9,
-      platillo: "WORM-BURGUER",
-      costo: 100,
-    },
-    {
-      id: 10,
-      platillo: "SOPA DE CAMARON",
-      costo: 120,
-    },
-    {
-      id: 11,
-      platillo: "CAMARONIZA",
-      costo: 80,
-    },    
-  ]
    
   function handleLogin(email, pass){
     if(email === 'oscaralberto@gmail.com' && pass === '123456'){
